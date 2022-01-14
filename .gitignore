@@ -52,6 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Custom Files
-*.json
+config.json
 .vs/
 obj/
+bin/
