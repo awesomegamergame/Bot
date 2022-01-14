@@ -14,6 +14,13 @@ namespace Discord_Bot.Commands
             await ctx.Channel.SendMessageAsync("Pong").ConfigureAwait(false);
         }
 
+        [Command("whyareyoutrash")]
+        [Description("Returns No U")]
+        public async Task NoU(CommandContext ctx)
+        {
+            await ctx.Channel.SendMessageAsync("No U").ConfigureAwait(false);
+        }
+
         [Command("add")]
         [Description("Adds two numbers together")]
         public async Task Add(CommandContext ctx,
