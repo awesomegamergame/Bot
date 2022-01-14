@@ -53,5 +53,5 @@ dkms.conf
 
 # Custom Files
 *.json
-.vs\
-obj\
+.vs/
+obj/
