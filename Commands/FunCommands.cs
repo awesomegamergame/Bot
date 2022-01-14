@@ -33,6 +33,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("respondmessage")]
+        [Description("Will repeat the message you send")]
         public async Task ResponseMessage(CommandContext ctx)
         {
             var interactivity = ctx.Client.GetInteractivity();
@@ -43,6 +44,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("respondreaction")]
+        [Description("Will repeat the emoji you send")]
         public async Task ResponseReaction(CommandContext ctx)
         {
             var interactivity = ctx.Client.GetInteractivity();
