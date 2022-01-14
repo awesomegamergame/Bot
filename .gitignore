@@ -51,4 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+# Custom Files
 *.json
+.vs\
+obj\
