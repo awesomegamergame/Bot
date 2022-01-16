@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Threading.Tasks;
+using Discord_Bot.Startup;
 
 namespace Discord_Bot
 {
@@ -6,8 +7,12 @@ namespace Discord_Bot
     {
         static void Main(string[] args)
         {
+            Decrypt.Decrypter();
+            var webServer = new WebServer();
             var bot = new Bot();
-            bot.RunAsync().GetAwaiter().GetResult();
+            Parallel.Invoke(
+                () => bot.RunAsync().GetAwaiter().GetResult(),
+                () => webServer.Task());
         }
-    }
+	}
 }
