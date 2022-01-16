@@ -9,14 +9,14 @@ namespace Discord_Bot.Startup
     {
         public static string Decrypter()
         {
-            string PasswordKey = Environment.GetEnvironmentVariable("Password"); //Repl.it's .env
-            //string PasswordKeyLocal = File.ReadAllText("password.txt"); //Local Password File
+            //string PasswordKey = Environment.GetEnvironmentVariable("Password"); //Repl.it's .env
+            string PasswordKeyLocal = File.ReadAllText("password.txt"); //Local Password File
             //string textToDecrypt = File.ReadAllText("Protected.json"); //Stable File
             string textToDecrypt = File.ReadAllText("ProtectedNightly.json"); //Nightly File
             string ToReturn = "";
             string publickey = "agg-bot.86716543";
-            //string privatekey = PasswordKeyLocal; //Local Password File
-            string privatekey = PasswordKey; //Repl.it's .env
+            string privatekey = PasswordKeyLocal; //Local Password File
+            //string privatekey = PasswordKey; //Repl.it's .env
             byte[] privatekeyByte = { };
             privatekeyByte = Encoding.UTF8.GetBytes(privatekey);
             byte[] publickeybyte = { };
