@@ -4,6 +4,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
@@ -59,30 +60,41 @@ namespace Discord_Bot.Commands
 
         [Command("poll")]
         [Description("Creates a Poll to Vote")]
-        public async Task Poll(CommandContext ctx, TimeSpan duration, params DiscordEmoji[] emojiOptions)
+        public async Task Poll(CommandContext ctx, string pollName, TimeSpan duration, params DiscordEmoji[] emojiOptions)
         {
             var interactivity = ctx.Client.GetInteractivity();
             var options = emojiOptions.Select(x => x.ToString());
 
             var pollEmbed = new DiscordEmbedBuilder
             {
-                Title = "Poll",
+                Title = pollName,
                 Description = string.Join(" ", options)
             };
 
             var pollMessage = await ctx.Channel.SendMessageAsync(embed: pollEmbed).ConfigureAwait(false);
 
-            foreach(var option in emojiOptions)
+            foreach (var option in emojiOptions)
             {
                 await pollMessage.CreateReactionAsync(option).ConfigureAwait(false);
             }
 
+            Thread.Sleep(100);
+
             var result = await interactivity.CollectReactionsAsync(pollMessage, duration).ConfigureAwait(false);
-            var distinctResult = result.Distinct();
 
-            var results = distinctResult.Select(x => $"{x.Emoji}: {x.Total}");
+            var reactions = result.Distinct().GroupBy(x => x.Emoji).Select(x => new ReactionFix() { Emoji = x.First().Emoji, Amount = x.Sum(y => y.Total) });
 
-            await ctx.Channel.SendMessageAsync(string.Join("\n", results)).ConfigureAwait(false);
+            await ctx.Channel.SendMessageAsync(string.Join("\n", reactions)).ConfigureAwait(false);
+        }
+    }
+    public class ReactionFix
+    {
+        public DiscordEmoji Emoji;
+        public int Amount;
+
+        public override string ToString()
+        {
+            return $"{Emoji.Name}:{Amount}";
         }
     }
 }
