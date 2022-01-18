@@ -52,6 +52,7 @@ namespace Discord_Bot
 
             Commands.RegisterCommands<FunCommands>();
             Commands.RegisterCommands<TeamCommands>();
+            Commands.RegisterCommands<MathCommands>();
 
             await Client.ConnectAsync();
 

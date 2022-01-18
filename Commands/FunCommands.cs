@@ -25,15 +25,6 @@ namespace Discord_Bot.Commands
             await ctx.Channel.SendMessageAsync("No U").ConfigureAwait(false);
         }
 
-        [Command("add")]
-        [Description("Adds two numbers together")]
-        public async Task Add(CommandContext ctx, [Description("First Number")] decimal numberOne, [Description("Second Number")] decimal numberTwo)
-        {
-            await ctx.Channel
-                .SendMessageAsync((numberOne + numberTwo).ToString())
-                .ConfigureAwait(false);
-        }
-
         [Command("respondmessage")]
         [Description("Will repeat the message you send")]
         public async Task ResponseMessage(CommandContext ctx)
