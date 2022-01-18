@@ -27,9 +27,7 @@ namespace Discord_Bot.Commands
 
         [Command("add")]
         [Description("Adds two numbers together")]
-        public async Task Add(CommandContext ctx,
-            [Description("First Number")] int numberOne,
-            [Description("Second Number")] int numberTwo)
+        public async Task Add(CommandContext ctx, [Description("First Number")] decimal numberOne, [Description("Second Number")] decimal numberTwo)
         {
             await ctx.Channel
                 .SendMessageAsync((numberOne + numberTwo).ToString())
@@ -60,14 +58,14 @@ namespace Discord_Bot.Commands
 
         [Command("poll")]
         [Description("Creates a Poll to Vote")]
-        public async Task Poll(CommandContext ctx, string pollName, TimeSpan duration, params DiscordEmoji[] emojiOptions)
+        public async Task Poll(CommandContext ctx, [Description("Use quotes around the entire question")] string pollQuestion, [Description("Time in either s,m,h,d ex:5m")] TimeSpan duration, [Description("Choose the Emoji's for the options")] params DiscordEmoji[] emojiOptions)
         {
             var interactivity = ctx.Client.GetInteractivity();
             var options = emojiOptions.Select(x => x.ToString());
 
             var pollEmbed = new DiscordEmbedBuilder
             {
-                Title = pollName,
+                Title = pollQuestion,
                 Description = string.Join(" ", options)
             };
 
