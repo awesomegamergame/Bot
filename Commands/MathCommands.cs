@@ -41,5 +41,21 @@ namespace Discord_Bot.Commands
             else
                 await ctx.Channel.SendMessageAsync("More than one variable is unknown").ConfigureAwait(false);
         }
+        [Command("roots")]
+        [Description("Finds the roots of any number using any index rounded to 4 decimal places")]
+        public async Task Roots(CommandContext ctx, [Description("The number of the root")]double index, [Description("The number that is getting rooted")]double radicand)
+        {
+            double Answer = Math.Round(Math.Pow(radicand, 1.0 / index), 4);
+            if(index == 1)
+                await ctx.Channel.SendMessageAsync("Cant do first roots");
+            else if (index == 2)
+                await ctx.Channel.SendMessageAsync($"\u221A{radicand} = {Answer}");
+            else if (index == 3)
+                await ctx.Channel.SendMessageAsync($"\u221B{radicand} = {Answer}");
+            else if (index == 4)
+                await ctx.Channel.SendMessageAsync($"\u221C{radicand} = {Answer}");
+            else
+                await ctx.Channel.SendMessageAsync($"{radicand} to the {index}th root is {Answer}");
+        }
     }
 }
