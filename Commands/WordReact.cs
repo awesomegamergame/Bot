@@ -82,7 +82,8 @@ namespace Bot.Commands
                 string words = string.Join(", ", reaction.Value);
 
                 // Add the emoji and words to the message
-                message += $":{reaction.Key}: {words}\n";
+                DiscordEmoji emoji = DiscordEmoji.FromName(ctx.Client, reaction.Key);
+                message += $":{emoji}: {words}\n";
             }
 
             // Send the message to the channel

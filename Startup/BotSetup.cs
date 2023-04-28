@@ -13,6 +13,7 @@ using Bot.Commands;
 using System.IO;
 using System.Text.Json;
 using DSharpPlus.Entities;
+using System.Text.RegularExpressions;
 
 namespace Bot.Startup
 {
@@ -78,13 +79,13 @@ namespace Bot.Startup
                     return;
 
                 string message = e.Message.Content.ToLower();
-                string[] messageContent = message.Split(' ');
-
                 foreach (var reaction in keyWords)
                 {
                     foreach (var word in reaction.Value)
                     {
-                        if (messageContent.Contains(word))
+                        // Check if the message contains the keyword surrounded by word boundaries
+                        string pattern = $@"\b{Regex.Escape(word)}\b";
+                        if (Regex.IsMatch(message, pattern))
                         {
                             // Send the corresponding emoji to the channel
                             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(Client, reaction.Key));
