@@ -24,13 +24,17 @@ namespace Bot.Startup
         public InteractivityExtension Interactivity { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
 
-        public static Dictionary<string, string> keyWords = new Dictionary<string, string>();
+        public static Dictionary<string, List<string>> keyWords;
         public async Task RunAsync()
         {
-            if (File.Exists("specificWords.json"))
+            if (File.Exists("wordReactions.json"))
             {
-                string jsonString = File.ReadAllText("specificWords.json");
-                keyWords = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonString);
+                string jsonString = File.ReadAllText("wordReactions.json");
+                keyWords = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonString);
+            }
+            else
+            {
+                keyWords = new Dictionary<string, List<string>>();
             }
 
             var config = new DiscordConfiguration
@@ -73,18 +77,18 @@ namespace Bot.Startup
                 if (e.Message.Author.IsBot)
                     return;
 
-                string messageContent = e.Message.Content.ToLower();
+                string message = e.Message.Content.ToLower();
+                string[] messageContent = message.Split(' ');
 
-                foreach (var word in keyWords)
+                foreach (var reaction in keyWords)
                 {
-                    if (messageContent.Contains(word.Key))
+                    foreach (var word in reaction.Value)
                     {
-                        if (word.Value.Contains("http"))
-                            await e.Message.RespondAsync(word.Value);
-                        else
+                        if (messageContent.Contains(word))
                         {
-                            var emoji = DiscordEmoji.FromName(Client, word.Value);
-                            await e.Message.CreateReactionAsync(emoji);
+                            // Send the corresponding emoji to the channel
+                            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(Client, reaction.Key));
+                            break;
                         }
                     }
                 }

@@ -16,47 +16,77 @@ namespace Bot.Commands
     public class WordReact : BaseCommandModule
     {
         [Command("add")]
-        public async Task Add(CommandContext ctx, string specificWord, DiscordEmoji emoji)
+        [Description("Add a new word reaction")]
+        public async Task AddWordReaction(CommandContext ctx, string reactionWord, DiscordEmoji emoji)
         {
-            BotSetup.keyWords[specificWord.ToLower()] = emoji.GetDiscordName();
+            string name = emoji.GetDiscordName();
+            // Check if the emoji is already in the dictionary
+            if (BotSetup.keyWords.ContainsKey(name))
+            {
+                // Add the word to the existing list for the emoji
+                BotSetup.keyWords[name].Add(reactionWord.ToLower());
+            }
+            else
+            {
+                // Create a new list for the emoji and add the word
+                BotSetup.keyWords[name] = new List<string>() { reactionWord.ToLower() };
+            }
+
+            // Save word reactions to file
             string jsonString = JsonSerializer.Serialize(BotSetup.keyWords);
-            await File.WriteAllTextAsync("specificWords.json", jsonString);
-            await ctx.RespondAsync($"'{specificWord}' has been set to '{emoji}'");
-        }
-        [Command("add")]
-        public async Task Add(CommandContext ctx, string specificWord, string imageLink)
-        {
-            BotSetup.keyWords[specificWord.ToLower()] = imageLink;
-            string jsonString = JsonSerializer.Serialize(BotSetup.keyWords);
-            await File.WriteAllTextAsync("specificWords.json", jsonString);
-            await ctx.RespondAsync($"'{specificWord}' has been set to '{imageLink}'");
+            File.WriteAllText("wordReactions.json", jsonString);
+
+            // Respond to the command with a success message
+            await ctx.RespondAsync($"Added word reaction: {reactionWord} => {emoji}");
         }
         [Command("remove")]
         public async Task Remove(CommandContext ctx, string specificWord)
         {
-            if (BotSetup.keyWords.Remove(specificWord.ToLower()))
+            bool found = false;
+            
+            foreach (var reaction in BotSetup.keyWords)
             {
-                await ctx.RespondAsync($"'{specificWord}' has been removed");
-                string jsonString = JsonSerializer.Serialize(BotSetup.keyWords);
-                await File.WriteAllTextAsync("specificWords.json", jsonString);
+                if (reaction.Value.Contains(specificWord.ToLower()))
+                {
+                    reaction.Value.Remove(specificWord.ToLower());
+                    found = true;
+
+                    // Remove an emoji entry from the dictionary if it has no other words
+                    if (reaction.Value.Count == 0)
+                    {
+                        BotSetup.keyWords.Remove(reaction.Key);
+                    }
+
+                }
+            }
+
+            if (!found)
+            {
+                await ctx.RespondAsync($"The word '{specificWord.ToLower()}' was not found in the dictionary.");
             }
             else
             {
-                await ctx.RespondAsync($"'{specificWord}' was not found in the list of specific words");
+                await ctx.RespondAsync($"The word '{specificWord.ToLower()}' was removed from the dictionary.");
+                string jsonString = JsonSerializer.Serialize(BotSetup.keyWords);
+                File.WriteAllText("wordReactions.json", jsonString);
             }
         }
         [Command("list")]
         public async Task List(CommandContext ctx)
         {
-            string message = "List of specific words and their corresponding response emojis:\n\n";
+            string message = "List of emojis and their corresponding words:\n\n";
 
-            foreach (var word in BotSetup.keyWords)
+            foreach (var reaction in BotSetup.keyWords)
             {
-                var emoji = DiscordEmoji.FromName(ctx.Client, word.Value);
-                message += $"{word.Key} => {emoji}\n";
+                // Concatenate the associated words into a comma-separated string
+                string words = string.Join(", ", reaction.Value);
+
+                // Add the emoji and words to the message
+                message += $":{reaction.Key}: {words}\n";
             }
 
-            await ctx.RespondAsync(message);
+            // Send the message to the channel
+            await ctx.Channel.SendMessageAsync(message);
         }
     }
 }
