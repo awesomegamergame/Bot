@@ -16,6 +16,7 @@ namespace Bot.Commands
     public class WordReact : BaseCommandModule
     {
         [Command("add")]
+        [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
         [Description("Add a new word reaction")]
         public async Task AddWordReaction(CommandContext ctx, string reactionWord, DiscordEmoji emoji)
         {
@@ -40,6 +41,7 @@ namespace Bot.Commands
             await ctx.RespondAsync($"Added word reaction: {reactionWord} => {emoji}");
         }
         [Command("remove")]
+        [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
         public async Task Remove(CommandContext ctx, string specificWord)
         {
             bool found = false;
