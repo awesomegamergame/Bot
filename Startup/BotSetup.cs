@@ -10,6 +10,9 @@ using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.Logging;
 using Bot.Commands;
+using System.IO;
+using System.Text.Json;
+using DSharpPlus.Entities;
 
 namespace Bot.Startup
 {
@@ -20,8 +23,16 @@ namespace Bot.Startup
         public DiscordClient Client { get; private set; }
         public InteractivityExtension Interactivity { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
+
+        public static Dictionary<string, string> keyWords = new Dictionary<string, string>();
         public async Task RunAsync()
         {
+            if (File.Exists("specificWords.json"))
+            {
+                string jsonString = File.ReadAllText("specificWords.json");
+                keyWords = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonString);
+            }
+
             var config = new DiscordConfiguration
             {
                 Intents = DiscordIntents.All,
@@ -53,8 +64,31 @@ namespace Bot.Startup
             //Command classes should be registered here
 
             Commands.RegisterCommands<Test>();
+            Commands.RegisterCommands<WordReact>();
 
             await Client.ConnectAsync();
+
+            Client.MessageCreated += async (sender, e) =>
+            {
+                if (e.Message.Author.IsBot)
+                    return;
+
+                string messageContent = e.Message.Content.ToLower();
+
+                foreach (var word in keyWords)
+                {
+                    if (messageContent.Contains(word.Key))
+                    {
+                        if (word.Value.Contains("http"))
+                            await e.Message.RespondAsync(word.Value);
+                        else
+                        {
+                            var emoji = DiscordEmoji.FromName(Client, word.Value);
+                            await e.Message.CreateReactionAsync(emoji);
+                        }
+                    }
+                }
+            };
 
             await Task.Delay(-1);
         }
