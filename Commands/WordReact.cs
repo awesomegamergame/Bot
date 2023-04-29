@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Bot.Commands
@@ -18,8 +19,10 @@ namespace Bot.Commands
         [Command("add")]
         [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
         [Description("Add a new word reaction")]
-        public async Task AddWordReaction(CommandContext ctx, string reactionWord, DiscordEmoji emoji)
+        public async Task AddWordReaction(CommandContext ctx, string word, DiscordEmoji emoji)
         {
+            string reactionWord = Regex.Replace(word, "[^a-zA-Z0-9 ]+", " ");
+
             string name = emoji.GetDiscordName();
             // Check if the emoji is already in the dictionary
             if (BotSetup.keyWords.ContainsKey(name))
@@ -42,8 +45,10 @@ namespace Bot.Commands
         }
         [Command("remove")]
         [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
-        public async Task Remove(CommandContext ctx, string specificWord)
+        public async Task Remove(CommandContext ctx, string word)
         {
+            string specificWord = Regex.Replace(word, "[^a-zA-Z0-9 ]+", " ");
+
             bool found = false;
             
             foreach (var reaction in BotSetup.keyWords)

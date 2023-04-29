@@ -78,7 +78,9 @@ namespace Bot.Startup
                 if (e.Message.Author.IsBot)
                     return;
 
-                string message = e.Message.Content.ToLower();
+                string messageContext = Regex.Replace(e.Message.Content, "[^a-zA-Z0-9 ]+", " ");
+
+                string message = messageContext.ToLower();
                 foreach (var reaction in keyWords)
                 {
                     foreach (var word in reaction.Value)
