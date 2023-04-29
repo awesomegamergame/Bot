@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 namespace Bot.Commands
 {
     [GroupAttribute("wordreact")]
+    [Description("Reacts with an emoji when someone says a word or phrase")]
     public class WordReact : BaseCommandModule
     {
         [Command("add")]
@@ -44,6 +45,7 @@ namespace Bot.Commands
             await ctx.RespondAsync($"Added word reaction: {reactionWord} => {emoji}");
         }
         [Command("remove")]
+        [Description("Removes a word from all the emojis its assigned to")]
         [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
         public async Task Remove(CommandContext ctx, string word)
         {
@@ -79,6 +81,7 @@ namespace Bot.Commands
             }
         }
         [Command("list")]
+        [Description("Lists out all the emojis and words that are assigned")]
         public async Task List(CommandContext ctx)
         {
             string message = "List of emojis and their corresponding words:\n\n";
