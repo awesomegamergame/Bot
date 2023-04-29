@@ -10,6 +10,10 @@ using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.CommandsNext;
 using Microsoft.Extensions.Logging;
 using Bot.Commands;
+using System.IO;
+using System.Text.Json;
+using DSharpPlus.Entities;
+using System.Text.RegularExpressions;
 
 namespace Bot.Startup
 {
@@ -20,8 +24,20 @@ namespace Bot.Startup
         public DiscordClient Client { get; private set; }
         public InteractivityExtension Interactivity { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
+
+        public static Dictionary<string, List<string>> keyWords;
         public async Task RunAsync()
         {
+            if (File.Exists("wordReactions.json"))
+            {
+                string jsonString = File.ReadAllText("wordReactions.json");
+                keyWords = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonString);
+            }
+            else
+            {
+                keyWords = new Dictionary<string, List<string>>();
+            }
+
             var config = new DiscordConfiguration
             {
                 Intents = DiscordIntents.All,
@@ -53,8 +69,33 @@ namespace Bot.Startup
             //Command classes should be registered here
 
             Commands.RegisterCommands<Test>();
+            Commands.RegisterCommands<WordReact>();
 
             await Client.ConnectAsync();
+
+            Client.MessageCreated += async (sender, e) =>
+            {
+                if (e.Message.Author.IsBot)
+                    return;
+
+                string messageContext = Regex.Replace(e.Message.Content, "[^a-zA-Z0-9 ]+", " ");
+
+                string message = messageContext.ToLower();
+                foreach (var reaction in keyWords)
+                {
+                    foreach (var word in reaction.Value)
+                    {
+                        // Check if the message contains the keyword surrounded by word boundaries
+                        string pattern = $@"\b{Regex.Escape(word)}\b";
+                        if (Regex.IsMatch(message, pattern))
+                        {
+                            // Send the corresponding emoji to the channel
+                            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(Client, reaction.Key));
+                            break;
+                        }
+                    }
+                }
+            };
 
             await Task.Delay(-1);
         }
