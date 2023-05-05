@@ -20,7 +20,7 @@ namespace Bot.Commands
         [Command("add")]
         [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
         [Description("Add a new word reaction")]
-        public async Task AddWordReaction(CommandContext ctx, string word, DiscordEmoji emoji)
+        public async Task AddWordReaction(CommandContext ctx, DiscordEmoji emoji, [RemainingText]string word)
         {
             string reactionWord = Regex.Replace(word, "[^a-zA-Z0-9 ]+", " ");
 
@@ -47,7 +47,7 @@ namespace Bot.Commands
         [Command("remove")]
         [Description("Removes a word from all the emojis its assigned to")]
         [RequirePermissions(DSharpPlus.Permissions.ManageEmojis)]
-        public async Task Remove(CommandContext ctx, string word)
+        public async Task Remove(CommandContext ctx, [RemainingText]string word)
         {
             string specificWord = Regex.Replace(word, "[^a-zA-Z0-9 ]+", " ");
 
